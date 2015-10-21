@@ -12,6 +12,7 @@ import Task
 
 type alias Library =
   { modules : List Module
+  , primitives : List Primitive
   }
 
 
@@ -20,7 +21,14 @@ type alias Module =
   , functions : List NamedFunction
   }
 
+
 type alias NamedFunction =
+  { id : Int
+  , name : String
+  }
+
+
+type alias Primitive =
   { id : Int
   , name : String
   }
@@ -28,7 +36,7 @@ type alias NamedFunction =
 
 init : (Library, Effects Action)
 init =
-  ( Library []
+  ( Library [ ] [ ]
   , fetchLibrary
   )
 
@@ -54,14 +62,23 @@ view : Signal.Address Action -> Library -> Html
 view address library =
   div
     [ ]
-    ( h2 [ ] [ text "Library" ] :: ( List.map ( moduleView address ) library.modules ) )
+    [ h2 [ ] [ text "Library" ]
+    , h3 [ ] [ text "Primitives" ]
+    , ul [ ] ( List.map ( primitiveView address ) library.primitives )
+    , h3 [ ] [ text "Functions"]
+    , ul [ ] ( List.map ( moduleView address ) library.modules )
+    ]
 
+
+primitiveView : Signal.Address Action -> Primitive -> Html
+primitiveView address primitive =
+  li [ ] [ text primitive.name ]
 
 moduleView : Signal.Address Action -> Module -> Html
 moduleView address libraryModule =
-  div
+  li
     [ ]
-    [ h3 [ ] [ text libraryModule.name ]
+    [ h4 [ ] [ text libraryModule.name ]
     , ul [ ] ( List.map ( functionView address ) libraryModule.functions )
     ]
 
@@ -88,14 +105,25 @@ apply func value =
 
 libraryDecoder : Json.Decoder Library
 libraryDecoder =
-  Json.object1 Library ("modules" := (Json.list moduleDecoder))
+  Json.object2
+    Library
+    ("modules" := (Json.list moduleDecoder))
+    ("primitives" := (Json.list primitiveDecoder))
 
 
 moduleDecoder : Json.Decoder Module
 moduleDecoder =
-  Json.object2 Module ("name" := Json.string) ("functions" := (Json.list namedFunctionDecoder))
+  Json.object2
+    Module
+    ("name" := Json.string)
+    ("functions" := (Json.list namedFunctionDecoder))
 
 
 namedFunctionDecoder : Json.Decoder NamedFunction
 namedFunctionDecoder =
   Json.object2 NamedFunction ("id" := Json.int) ("name" := Json.string)
+
+
+primitiveDecoder : Json.Decoder Primitive
+primitiveDecoder =
+  Json.object2 Primitive ("id" := Json.int) ("name" := Json.string)
