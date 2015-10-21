@@ -52,15 +52,23 @@ update action model =
 
 view : Signal.Address Action -> Library -> Html
 view address library =
-  let
-    moduleName =
-      List.head library.modules
-        |> Maybe.withDefault (Module "none" [])
-        |> (.name)
-  in
-    div
-      [ ]
-      [ h2 [ ] [text moduleName] ]
+  div
+    [ ]
+    ( h2 [ ] [ text "Library" ] :: ( List.map ( moduleView address ) library.modules ) )
+
+
+moduleView : Signal.Address Action -> Module -> Html
+moduleView address libraryModule =
+  div
+    [ ]
+    [ h3 [ ] [ text libraryModule.name ]
+    , ul [ ] ( List.map ( functionView address ) libraryModule.functions )
+    ]
+
+
+functionView : Signal.Address Action -> NamedFunction -> Html
+functionView address namedFunction =
+  li [ ] [ text namedFunction.name ]
 
 
 -- EFFECTS
