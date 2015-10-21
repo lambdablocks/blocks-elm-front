@@ -3,56 +3,91 @@ module LibraryComponent where
 import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Http
-import Json.Decode as Json
+import Json.Decode as Json exposing ((:=))
+import List as List
 import Task
 
 
 -- MODEL
 
-type alias Model = String
+type alias Library =
+  { modules : List Module
+  }
 
 
-init : (Model, Effects Action)
+type alias Module =
+  { name : String
+  , functions : List NamedFunction
+  }
+
+type alias NamedFunction =
+  { id : Int
+  , name : String
+  }
+
+
+init : (Library, Effects Action)
 init =
-  ( "Hello world"
-  , fetchMessage
+  ( Library []
+  , fetchLibrary
   )
 
 
 -- UPDATE
 
 type Action =
-  NewMessage (Maybe String)
+  LoadLibrary (Maybe Library)
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Library -> (Library, Effects Action)
 update action model =
   case action of
-    NewMessage maybeMsg ->
-      ( Maybe.withDefault model maybeMsg
+    LoadLibrary maybeLibrary ->
+      ( Maybe.withDefault model maybeLibrary
       , Effects.none
       )
 
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  div
-    [ ]
-    [ h2 [ ] [text model] ]
+view : Signal.Address Action -> Library -> Html
+view address library =
+  let
+    moduleName =
+      List.head library.modules
+        |> Maybe.withDefault (Module "none" [])
+        |> (.name)
+  in
+    div
+      [ ]
+      [ h2 [ ] [text moduleName] ]
 
 
 -- EFFECTS
 
-fetchMessage : Effects Action
-fetchMessage =
-  Http.get decodeUrl "http://demo5895613.mockable.io/library/js/1"
+fetchLibrary : Effects Action
+fetchLibrary =
+  Http.get libraryDecoder "http://demo5895613.mockable.io/library/js/1"
     |> Task.toMaybe
-    |> Task.map NewMessage
+    |> Task.map LoadLibrary
     |> Effects.task
 
 
-decodeUrl : Json.Decoder String
-decodeUrl =
-  Json.at ["msg"] Json.string
+apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
+apply func value =
+  Json.object2 (<|) func value
+
+
+libraryDecoder : Json.Decoder Library
+libraryDecoder =
+  Json.object1 Library ("modules" := (Json.list moduleDecoder))
+
+
+moduleDecoder : Json.Decoder Module
+moduleDecoder =
+  Json.object2 Module ("name" := Json.string) ("functions" := (Json.list namedFunctionDecoder))
+
+
+namedFunctionDecoder : Json.Decoder NamedFunction
+namedFunctionDecoder =
+  Json.object2 NamedFunction ("id" := Json.int) ("name" := Json.string)
