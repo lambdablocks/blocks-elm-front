@@ -6,7 +6,6 @@ import Task
 
 import LibraryComponent as Library
 import WorkspaceComponent as Workspace
-import WorkspaceActions
 
 
 app =
@@ -26,10 +25,7 @@ view address library =
       [ Library.view address library ]
     , div
       [ style [ ("width", "60%"), ("height", "100%"), ("float", "right") ] ]
-      [ h2 [ ] [ text "Workspace" ]
-      , WorkspaceActions.view address
-      , Workspace.view address
-      ]
+      [ Workspace.view address ]
     ]
 
 
