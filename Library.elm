@@ -1,4 +1,4 @@
-module Library where
+module Library (init, update, view) where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
