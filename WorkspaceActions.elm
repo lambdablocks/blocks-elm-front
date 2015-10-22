@@ -15,6 +15,7 @@ view address =
 actionsStyles =
   style
     [ ("width", "16px")
+    , ("float", "left")
     ]
 
 
