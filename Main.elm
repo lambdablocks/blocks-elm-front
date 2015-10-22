@@ -4,8 +4,8 @@ import Html.Attributes exposing (style)
 import StartApp
 import Task
 
-import LibraryComponent as Library
-import WorkspaceComponent as Workspace
+import Library
+import Workspace
 
 
 app =

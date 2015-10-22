@@ -1,4 +1,4 @@
-module WorkspaceComponent where
+module Workspace where
 
 import Html exposing (..)
 import Html.Attributes exposing (classList, style)

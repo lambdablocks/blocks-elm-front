@@ -1,4 +1,4 @@
-module LibraryComponent where
+module Library where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
