@@ -4,6 +4,7 @@ import Html.Attributes exposing (style)
 import StartApp
 import Task
 
+import Brick
 import Library
 import Workspace
 
@@ -25,7 +26,7 @@ view address library =
       [ Library.view address library ]
     , div
       [ style [ ("width", "60%"), ("height", "100%"), ("float", "right") ] ]
-      [ Workspace.view address ]
+      [ Workspace.view address [Brick.buildEmptyBrick 2 1 150 200 (-150, 250)] ]
     ]
 
 
